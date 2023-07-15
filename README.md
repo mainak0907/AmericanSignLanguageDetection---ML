@@ -31,7 +31,9 @@ git clone https://github.com/your-username/asl-detection.git
 
 2. Change to the project directory:
 
-```cd asl-detection```
+```
+cd asl-detection
+```
 
 
 3. Create a virtual environment (optional but recommended):
@@ -44,7 +46,9 @@ env\Scripts\activate # For Windows
 
 4. Install the required dependencies:
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
 
 5. Download the pre-trained model weights:
