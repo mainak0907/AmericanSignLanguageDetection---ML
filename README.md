@@ -63,7 +63,9 @@ To use the ASL Detection project, follow these steps:
 
 2. Run the following command to start the real-time ASL gesture detection:
 
-```python detect_asl.py```
+```
+python detect_asl.py
+```
 
 
 This will open a new window showing the webcam feed, with ASL gesture detection overlays.
@@ -72,7 +74,9 @@ This will open a new window showing the webcam feed, with ASL gesture detection 
 
 Alternatively, you can use pre-recorded videos by specifying the file path as an argument:
 
-```python detect_asl.py --video /path/to/video.mp4```
+```
+python detect_asl.py --video /path/to/video.mp4
+```
 
 
 This will process the specified video and display the ASL gesture detection results.
@@ -87,7 +91,9 @@ If you want to train the ASL Detection model on your own dataset, you can follow
 
 3. Run the following command to start the model training:
 
-```python train.py```
+```
+python train.py
+```
 
 
 This will train the model on the provided dataset and save the trained weights in the `weights/` directory.
