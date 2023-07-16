@@ -14,6 +14,7 @@ counter = 0
 
 while True:
     success, img = cap.read()
+    frame=cv2.flip(img,1)
     hands, img = detector.findHands(img)
     if hands:
         hand = hands[0]

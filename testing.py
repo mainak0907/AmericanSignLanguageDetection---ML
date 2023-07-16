@@ -18,13 +18,15 @@ for i in range(ord("A"),ord("Z")):
 
 while True:
     success, img = cap.read()
+    frame=cv2.flip(img,1)
+
     imgOutput = img.copy()
     hands, img = detector.findHands(img)
     if hands:
         hand = hands[0]
         x, y, w, h = hand['bbox']
 
-        imgWhite = np.ones((imgSize, imgSize, 3), np.uint8) * 255
+        imgWhite = np.ones((28, 28, 1), np.uint8) * 255
         imgCrop = img[y - offset:y + h + offset, x - offset:x + w + offset]
 
         imgCropShape = imgCrop.shape
