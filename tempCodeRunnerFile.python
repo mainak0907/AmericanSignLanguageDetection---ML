@@ -1,0 +1,34 @@
+import gensim
+import numpy as np
+
+# Load pre-trained word embeddings (e.g., Word2Vec or GloVe)
+model = gensim.models.KeyedVectors.load_word2vec_format('path_to_word_embeddings.bin', binary=True)
+
+def find_similar_words(garbage_word, model, topn=10):
+    similar_words = []
+    if garbage_word not in model:
+        return similar_words
+    
+    # Calculate cosine similarity between the garbage word and all other words
+    word_vector = model[garbage_word]
+    similarities = model.cosine_similarities(word_vector, model.vectors)
+
+    # Get indices of top-n most similar words
+    top_indices = np.argsort(similarities)[::-1][:topn]
+    
+    # Retrieve the actual words
+    for index in top_indices:
+        similar_words.append(model.index2word[index])
+    
+    return similar_words
+
+# Example usage
+garbage_word = 'gjksadkjl'
+similar_words = find_similar_words(garbage_word, model)
+
+if similar_words:
+    print(f"Similar words to '{garbage_word}':")
+    for word in similar_words:
+        print(word)
+else:
+    print(f"No similar words found for '{garbage_word}'.")
