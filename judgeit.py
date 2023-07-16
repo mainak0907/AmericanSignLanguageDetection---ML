@@ -3,10 +3,6 @@ import mediapipe as mp
 import numpy as np
 import tensorflow as tf
 
-def get_label_from_class(class_index):
-    out = chr(ord("A")+class_index)
-    return out
-
 def get_hand_bounding_box(hand_landmarks, image_width, image_height):
     landmark_list = []
     for landmark in hand_landmarks.landmark:
@@ -21,28 +17,34 @@ def get_hand_bounding_box(hand_landmarks, image_width, image_height):
 
     return x_min, y_min, x_max, y_max
 
-
 # Initialize hand detection module
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
 
-# Load the CNN model for American Sign Language
-model = tf.keras.models.load_model('americanSignLanguage.h5')
+# Load the TensorFlow Lite model for American Sign Language
+interpreter = tf.lite.Interpreter(model_path='model.tflite')
+interpreter.allocate_tensors()
+
+# Get input and output details of the model
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Function to preprocess the cropped hand image for the model
 def preprocess_image(image):
     # Convert image to grayscale
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Resize the image to match the model's input shape
-    image_resized = cv2.resize(image_gray, (28, 28))
-    # Reshape the image to have a single channel
-    image_reshaped = image_resized.reshape((28, 28, 1))
+    image_resized = cv2.resize(image_gray, (13, 12))
+    # Reshape the image to have a single channel and the expected dimensions
+    image_reshaped = image_resized.reshape((1, 156))
     # Normalize the pixel values to the range [0, 1]
-    #image_normalized = image_reshaped / 255.0
-    # Expand the dimensions to match the model's input shape
-    image_expanded = np.expand_dims(image_reshaped, axis=0)
-    return image_expanded
+    image_normalized = image_reshaped / 255.0
+    return image_normalized
+
+def get_label_from_class(index):
+    out = chr(ord("A")+index)
+    return out
 
 cap = cv2.VideoCapture(0)
 
@@ -69,10 +71,16 @@ while True:
 
         # Preprocess the hand image for the model
         preprocessed_image = preprocess_image(hand_image)
+        preprocessed_image = np.float32(preprocessed_image)
+        # Set the preprocessed image as the input to the model
+        interpreter.set_tensor(input_details[0]['index'], preprocessed_image)
 
-        # Perform prediction using the CNN model
-        prediction = model.predict(preprocessed_image)
-        predicted_class = np.argmax(prediction)
+        # Run inference on the model
+        interpreter.invoke()
+
+        # Get the output of the model
+        output = interpreter.get_tensor(output_details[0]['index'])
+        predicted_class = np.argmax(output)
         predicted_label = get_label_from_class(predicted_class)  # Function to map class index to label
 
         # Display the predicted label
