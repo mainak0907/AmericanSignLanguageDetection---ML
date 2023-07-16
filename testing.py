@@ -18,6 +18,8 @@ for i in range(ord("A"),ord("Z")):
 
 while True:
     success, img = cap.read()
+    frame=cv2.flip(img,1)
+
     imgOutput = img.copy()
     hands, img = detector.findHands(img)
     if hands:
