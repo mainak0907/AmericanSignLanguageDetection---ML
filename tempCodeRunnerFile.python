@@ -1,34 +1,38 @@
-import gensim
-import numpy as np
+from fuzzywuzzy import fuzz, process
 
-# Load pre-trained word embeddings (e.g., Word2Vec or GloVe)
-model = gensim.models.KeyedVectors.load_word2vec_format('path_to_word_embeddings.bin', binary=True)
+def find_similar_names(garbage_name, name_list, topn=10):
+    similar_names = process.extract(garbage_name, name_list, limit=topn)
+    return similar_names
 
-def find_similar_words(garbage_word, model, topn=10):
-    similar_words = []
-    if garbage_word not in model:
-        return similar_words
-    
-    # Calculate cosine similarity between the garbage word and all other words
-    word_vector = model[garbage_word]
-    similarities = model.cosine_similarities(word_vector, model.vectors)
-
-    # Get indices of top-n most similar words
-    top_indices = np.argsort(similarities)[::-1][:topn]
-    
-    # Retrieve the actual words
-    for index in top_indices:
-        similar_words.append(model.index2word[index])
-    
-    return similar_words
+def find_best_match(predicted_names, first_two_letters):
+    best_match = None
+    best_score = 0
+    for name, score in predicted_names:
+        if name[:2].lower() == first_two_letters.lower() and score > best_score:
+            best_match = name
+            best_score = score
+    return best_match
 
 # Example usage
-garbage_word = 'gjksadkjl'
-similar_words = find_similar_words(garbage_word, model)
+file_path = 'words_alpha.txt'
 
-if similar_words:
-    print(f"Similar words to '{garbage_word}':")
-    for word in similar_words:
-        print(word)
+with open(file_path, 'r', encoding='utf-8') as file:
+    name_list = [line.strip() for line in file]
+
+garbage_name = 'Shaa'.lower()
+predicted_names = find_similar_names(garbage_name, name_list)
+
+if predicted_names:
+    print(f"Similar names to '{garbage_name}':")
+    for name, score in predicted_names:
+        if(name[0] == garbage_name[0] and len(name)>2):
+            print(f"{name} (Score: {score})")
+
+    first_two_letters = garbage_name[0]
+    best_match = find_best_match(predicted_names, first_two_letters)
+    if best_match:
+        print(f"\nBest match with the first two letters '{first_two_letters}': {best_match}")
+    else:
+        print(f"\nNo match found with the first two letters '{first_two_letters}'")
 else:
-    print(f"No similar words found for '{garbage_word}'.")
+    print(f"No similar names found for '{garbage_name}'.")
