@@ -12,9 +12,6 @@ from string import ascii_uppercase
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from hunspell import Hunspell
-import enchant
-
 from keras.models import model_from_json
 
 os.environ["THEANO_FLAGS"] = "device=cuda, assert_no_cpu_op=True"
@@ -25,7 +22,6 @@ class Application:
 
     def __init__(self):
 
-        self.hs = Hunspell('en_US')
         self.vs = cv2.VideoCapture(0)
         self.current_image = None
         self.current_image2 = None
