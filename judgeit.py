@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import tensorflow as tf
 import time
+import sentenceguide
 
 def get_hand_bounding_box(hand_landmarks, image_width, image_height):
     landmark_list = []
@@ -75,10 +76,12 @@ while True:
 
             # Crop the hand region from the image
             hand_image = image[y_min:y_max, x_min:x_max]
-
-            # Preprocess the hand image for the model
-            preprocessed_image = preprocess_image(hand_image)
-            preprocessed_image = np.float32(preprocessed_image)
+            try:
+                # Preprocess the hand image for the model
+                preprocessed_image = preprocess_image(hand_image)
+                preprocessed_image = np.float32(preprocessed_image)
+            except:
+                pass
             # Set the preprocessed image as the input to the model
             interpreter.set_tensor(input_details[0]['index'], preprocessed_image)
 
@@ -107,6 +110,8 @@ while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             print(output2)
             break
-
+        
+        
+sentenceguide.thisistheway(output2) 
 cap.release()
 cv2.destroyAllWindows()
